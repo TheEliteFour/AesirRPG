@@ -1,0 +1,7 @@
+name: AesirRPG
+main: net.aesircraft.AesirRPG.AesirRPG
+version: V1.0
+description: Aesir RPG Plugin!
+authors: [Xeology]
+softdepend: [Heroes]
+commands: 
