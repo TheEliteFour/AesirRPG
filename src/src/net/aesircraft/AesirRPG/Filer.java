@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -77,6 +79,144 @@ public class Filer
 		return new File(AesirRPG.getStatic().getDataFolder() + sep + "Players" + sep + name(quester) + ".plr");
 	}
 
+	
+	public static void updateBlockCounts(Quester quester){
+		File file=file(quester);
+		YamlConfiguration config=new YamlConfiguration();
+		try
+		{
+			config.load(file);
+			Quest quest=new Quest();
+			quest.load(quester.getQuest());
+			List<Integer> blocks=quest.getBlocks();
+			List<Byte> blockDatas=quest.getBlockDatas();
+			List<Integer> list = null;
+			for (int ctr=0;ctr<blocks.size();ctr++){
+				list.clear();
+				list.add(blockDatas.get(ctr).intValue());
+				list.add(quester.getBlockProgress(blocks.get(ctr), blockDatas.get(ctr)));				
+			config.set("blocks."+blocks.get(ctr), list);
+			}
+			config.save(file);
+		}
+		catch (FileNotFoundException ex)
+		{
+		}
+		catch (IOException ex)
+		{
+		}
+		catch (InvalidConfigurationException ex)
+		{
+		}
+		
+	}
+	
+	
+	
+	public static void updateCollectItems(Quester quester){
+		File file=file(quester);
+		YamlConfiguration config=new YamlConfiguration();
+		try
+		{
+			config.load(file);
+			Quest quest=new Quest();
+			quest.load(quester.getQuest());
+			List<ItemStack> items=quest.getCollectItems();
+			List<Integer> list = null;
+			for (int ctr=0;ctr<items.size();ctr++){
+				list.clear();
+				list.add((int) items.get(ctr).getData().getData());
+				list.add(quester.getCollectItemProgress(items.get(ctr)));				
+			config.set("collectitems."+items.get(ctr), list);
+			}
+			config.save(file);
+		}
+		catch (FileNotFoundException ex)
+		{
+		}
+		catch (IOException ex)
+		{
+		}
+		catch (InvalidConfigurationException ex)
+		{
+		}
+		
+	}
+	
+	
+	
+	public static void updateKills(Quester quester){
+		File file=file(quester);
+		YamlConfiguration config=new YamlConfiguration();
+		try
+		{
+			config.load(file);
+			Quest quest=new Quest();
+			quest.load(quester.getQuest());
+			List<String> kills=quest.getKills();
+			for (int ctr=0;ctr<kills.size();ctr++){
+			config.set("kills."+kills.get(ctr), quester.getKillsProgress(kills.get(ctr).toLowerCase()));
+			}
+			config.save(file);
+		}
+		catch (FileNotFoundException ex)
+		{
+		}
+		catch (IOException ex)
+		{
+		}
+		catch (InvalidConfigurationException ex)
+		{
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	public static void updateBlockDestroyCounts(Quester quester){
+		File file=file(quester);
+		YamlConfiguration config=new YamlConfiguration();
+		try
+		{
+			config.load(file);
+			Quest quest=new Quest();
+			quest.load(quester.getQuest());
+			List<Integer> blocks=quest.getBlockDestroys();
+			List<Byte> blockDatas=quest.getBlockDestroyData();
+			List<Integer> list = null;
+			for (int ctr=0;ctr<blocks.size();ctr++){
+				list.clear();
+				list.add(blockDatas.get(ctr).intValue());
+				list.add(quester.getBlockProgress(blocks.get(ctr), blockDatas.get(ctr)));				
+			config.set("blockdestroys."+blocks.get(ctr), list);
+			}
+			config.save(file);
+		}
+		catch (FileNotFoundException ex)
+		{
+		}
+		catch (IOException ex)
+		{
+		}
+		catch (InvalidConfigurationException ex)
+		{
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public static void newQuest(Quest quest)
 	{
 		File file = file(quest);

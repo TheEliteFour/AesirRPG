@@ -6,6 +6,8 @@ import net.aesircraft.TrueEconomy.Data.Bank;
 import net.aesircraft.TrueEconomy.Data.Form;
 import net.aesircraft.TrueEconomy.Data.Players;
 import net.aesircraft.TrueEconomy.Exchange;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,6 +25,151 @@ public class Quester
 	private List<Integer> blockDestroys;
 	private List<Byte> blockDestroyData;
 	private List<Integer> blockDestroyCounts;
+	
+	
+	
+	public void echoRequirements(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		if (questa.getBlocks()!=null){
+			List<Integer> blocksa=questa.getBlockCounts();
+			List<Integer> blocksn=questa.getBlocks();
+			List<Byte> blocksd=questa.getBlockDatas();
+
+			for (int ctr=0;ctr<blocksa.size();ctr++){
+				player.sendMessage("§2Place §b"+Material.getMaterial(blocksn.get(ctr)).name()+"§2 Data: §b"+blocksd.get(ctr)+" - §b"+blockCounts.get(ctr)+"§2 of §b"+blocksa.get(ctr));					
+			}
+		}
+		if (questa.getBlockDestroys()!=null){
+			List<Integer> blockDestroysa=questa.getBlockDestroyCounts();
+			List<Integer> blockDestroysn=questa.getBlockDestroys();
+			List<Byte> blockDestroysd=questa.getBlockDestroyData();
+			for (int ctr1=0;ctr1<blockDestroysa.size();ctr1++){
+				player.sendMessage("§2Destroy §b"+Material.getMaterial(blockDestroysn.get(ctr1)).name()+"§2 Data: §b"+blockDestroysd.get(ctr1)+" - §b"+blockDestroyCounts.get(ctr1)+"§2 of §b"+blockDestroysa.get(ctr1));
+			}
+		}
+		
+		if (questa.getKills()!=null){
+			List<String> killsa=questa.getKills();
+			List<Integer> killsc=questa.getKillCounts();
+			for (int ctr2=0;ctr2<killsa.size();ctr2++){
+				player.sendMessage("§2Kill §b"+killsa.get(ctr2)+"§2 - §b"+kills.get(killsa.get(ctr2).toLowerCase())+"§2 of §b"+ killsc.get(ctr2));
+			}
+				
+		}
+		
+		if (questa.getCollectItems()!=null){
+			List<ItemStack> items=questa.getCollectItems();
+			for (int ctr3=0;ctr3<items.size();ctr3++){
+				player.sendMessage("§2Collect §b"+items.get(ctr3).getType().name()+"§2 Data: §b"+items.get(ctr3).getData()+ " - §b"+getCollectItemProgress(items.get(ctr3))+"§2 of §b"+items.get(ctr3).getAmount());
+			}
+		}
+		
+		if (questa.getRequiredItems()!=null){
+			List<ItemStack> itemsa=questa.getRequiredItems();
+			for (int ctr4=0;ctr4<itemsa.size();ctr4++){
+				player.sendMessage("§2Give §b"+itemsa.get(ctr4).getType().name()+"§2 Data: §b"+itemsa.get(ctr4).getData()+"§2 Amount: §b"+itemsa.get(ctr4).getAmount()+"§2 - §b"+InventoryWorkaround.containsItem(player.getInventory(), true, itemsa.get(ctr4)));
+		
+			}
+		}
+		
+		if (questa.getRequiredExp()!=0){
+			player.sendMessage("§2Give Exp - §b"+getExp()+"§2 of §b"+questa.getRequiredExp());
+							
+		}
+		
+		if (questa.getRequiredEyrir()!=0){
+			player.sendMessage("§2Give Eyrir - §b"+getEyrir()+"§2 of §b"+questa.getRequiredEyrir());			
+		}
+		
+	}
+	
+	public void echoDescription(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		player.sendMessage("§eTitle: §b"+questa.getTitle());
+		player.sendMessage("§e------------------");
+		player.sendMessage("§bDescription: §e");
+		List<String> messages=questa.getDescription();
+			for (int ctr=0;ctr<messages.size();ctr++){
+				player.sendMessage("§e"+messages.get(ctr));
+			}
+	}
+	
+	public void echoRewards(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		player.sendMessage("§eRewards");
+		player.sendMessage("§e------------------");
+		List<String> messages=questa.getRewardDescription();
+			for (int ctr=0;ctr<messages.size();ctr++){
+				player.sendMessage("§e"+messages.get(ctr));
+			}
+	}
+	
+	
+	
+	public void completeQuest(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		if (hasMetRequirements()){
+			takeRequirements();
+			giveRewards();
+			List<String> messages=questa.getCompletionMessage();
+			for (int ctr=0;ctr<messages.size();ctr++){
+				player.sendMessage("§e"+messages.get(ctr));
+			}
+			complete();
+		}		
+	}
+	
+	public void giveRewards(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		if (questa.getRewardItems()!=null){
+			List<ItemStack> items=questa.getRewardItems();
+			for (int ctr4=0;ctr4<items.size();ctr4++){
+				InventoryWorkaround.addItem(player.getInventory(), true,items.get(ctr4));
+					
+			}
+		}
+		
+		if (questa.getRewardExp()!=0){
+			addExp(questa.getRewardExp());			
+		}
+		if (questa.getHeroesExp()!=0){
+			addHeroExp(questa.getHeroesExp());			
+		}
+		
+		if (questa.getRewardEyrir()!=0){
+			addEyrir(questa.getRewardEyrir());			
+		}
+	}
+	
+	
+	public void takeRequirements(){
+		Quest questa=new Quest();
+		questa.load(quest);
+		
+		
+		
+		if (questa.getRequiredItems()!=null){
+			List<ItemStack> items=questa.getRequiredItems();
+			for (int ctr4=0;ctr4<items.size();ctr4++){
+				InventoryWorkaround.removeItem(player.getInventory(), true,items.get(ctr4));
+					
+			}
+		}
+		
+		if (questa.getRequiredExp()!=0){
+			subtractExp(questa.getRequiredExp());			
+		}
+		
+		if (questa.getRequiredEyrir()!=0){
+			subtractEyrir(questa.getRequiredEyrir());			
+		}		
+		
+	}
 	
 	
 	public boolean hasMetRequirements(){
@@ -69,7 +216,7 @@ public class Quester
 		}
 		
 		if (questa.getRequiredExp()!=0){
-			if (getExp()<questa.getRewardExp())
+			if (getExp()<questa.getRequiredExp())
 				return false;			
 		}
 		
@@ -82,14 +229,15 @@ public class Quester
 		
 	}
 	
-	public double getEyrir(){
+	private double getEyrir(){
 		return Players.get(player.getName().toLowerCase());
 	}
-	public void subtractEyrir(double amount){
+	private void subtractEyrir(double amount){
 		Players.sub(player.getName().toLowerCase(),amount);
+		player.sendMessage("§2You gave §b"+Form.form(amount)+"§2 to complete the quest.");
 		Bank.add(amount);
 	}
-	public void addEyrir(double amount){
+	private void addEyrir(double amount){
 		if (Bank.locked()){
 			player.sendMessage("§4You were unable to recieve the amount of §b"+Form.form(amount)+"§4 because the bank is locked down!");
 			return;
@@ -140,7 +288,7 @@ public class Quester
 		return false;
 	}
 	
-	public void complete()
+	private void complete()
 	{
 		Quest questa = new Quest();
 		questa.load(quest);
@@ -151,8 +299,10 @@ public class Quester
 	
 	public void setOnQuest(Quest quest)
 	{
+		if (canQuest(quest)){
 		Filer.newPQuest(this, quest);
 		quest.addQuester(player.getName().toLowerCase());
+		}
 	}
 	
 	public int getCollectItemProgress(ItemStack item)
@@ -183,6 +333,7 @@ public class Quester
 			collectItems.remove(stack);
 			collectItems.put(stack, amount + item.getAmount());
 		}
+		Filer.updateCollectItems(this);
 	}
 	
 	public void addAKill(String kill)
@@ -193,6 +344,7 @@ public class Quester
 			kills.remove(kill.toLowerCase());
 			kills.put(kill.toLowerCase(), amount + 1);
 		}
+		Filer.updateKills(this);
 	}
 	
 	public boolean doingBlock(int id, byte data)
@@ -267,6 +419,7 @@ public class Quester
 				}
 			}			
 		}
+		Filer.updateBlockCounts(this);
 	}
 	
 	public void addABlockDestroy(int id, byte data)
@@ -281,6 +434,7 @@ public class Quester
 				}
 			}			
 		}
+		Filer.updateBlockDestroyCounts(this);
 	}
 	
 	public void addBlocks(int id, byte data, int count)
@@ -308,24 +462,24 @@ public class Quester
 	}
 	
 	
-	public String getHeroClass(){
+	private String getHeroClass(){
 		if (AesirRPG.heroes)
 		return AesirRPG.hero.getHeroManager().getHero(player).getHeroClass().getName();
 		return "";
 	}
 	
-	public boolean isHeroClass(String name){
+	private boolean isHeroClass(String name){
 		if (AesirRPG.heroes)
 		return (AesirRPG.hero.getHeroManager().getHero(player).getHeroClass().getName().toLowerCase().equals(name.toLowerCase()));
 		return false;
 	}
 	
-	public void addHeroExp(double amount){
+	private void addHeroExp(double amount){
 		if (AesirRPG.heroes)
 		AesirRPG.hero.getHeroManager().getHero(player).addExp(amount, AesirRPG.hero.getHeroManager().getHero(player).getHeroClass());
 	}
 	
-	public int getExp(){
+	private int getExp(){
 		return player.getTotalExperience();
 	}
 	
@@ -335,23 +489,31 @@ public class Quester
 			}
 	}
 	
-	public boolean canQuest(Quest quest){
+	private boolean canQuest(Quest quest){
 		String requiredQuest;
 		String hClass;		
 		if (quest.getRequiredClass()!=null && AesirRPG.heroes){
 		hClass=quest.getRequiredClass().toLowerCase();
 		if (!isHeroClass(hClass))
+			player.sendMessage("§4You are not a §b"+hClass+"§4!");
 			return false;
 		}
 		if (quest.getRequires()!=null){
 		requiredQuest=quest.getRequires();
 		if (!completed(requiredQuest))
+			player.sendMessage("§4You have not completed §b"+requiredQuest+"§4!");
 			return false;
+		}
+		if (!quest.isRepeatable()){
+			if (completed(quest.getTitle())){
+			player.sendMessage("§4You already completed this quest!");
+			return false;
+			}
 		}
 		return true;
 	}
 	
-	public boolean completed(String name){
+	private boolean completed(String name){
 		Quest quest=new Quest();
 		quest.load(name);
 		if (quest.isLoaded()){
@@ -364,7 +526,11 @@ public class Quester
 		return false;
 			
 	}
-	
+	public void addExp(int amount){
+			for (int expctr=0;expctr<amount;expctr++){
+				player.giveExp(1);
+			}
+	}
 	public void subtractExp(int amount){
 		int exp=player.getTotalExperience()-amount;			
 			player.setExp(0);

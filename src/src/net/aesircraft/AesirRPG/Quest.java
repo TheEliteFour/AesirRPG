@@ -354,7 +354,7 @@ public class Quest
 	{
 		blockDestroys.add(id);
 		blockDestroyData.add(data);
-		blockDestroyCounts.add(count);
+		blockDestroyCounts.add(count);		
 	}
 
 	public void removeBlockDestroy(int index)
